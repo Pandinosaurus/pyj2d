@@ -99,11 +99,15 @@ class Panel(JPanel, MouseListener,
 
     def mousePressed(self, event):
         self.event.mousePress[event.button] = True
-        self.event._updateQueue(event, MouseEvent.MOUSE_PRESSED)
+        if event.getButton() not in (4,5):
+            self.event._updateQueue(event, MouseEvent.MOUSE_PRESSED)
+        else:
+            self.event._updateQueue(event, MouseEvent.MOUSE_WHEEL)
 
     def mouseReleased(self, event):
         self.event.mousePress[event.button] = False
-        self.event._updateQueue(event, MouseEvent.MOUSE_RELEASED)
+        if event.getButton() not in (4,5):
+            self.event._updateQueue(event, MouseEvent.MOUSE_RELEASED)
 
     def mouseEntered(self, event):
         self.event.mouseEvt['pos']['x'] = event.getX()
@@ -138,6 +142,8 @@ class Panel(JPanel, MouseListener,
 
     def mouseWheelMoved(self, event):
         self.event._updateQueue(event, MouseEvent.MOUSE_PRESSED)
+        self.event._updateQueue(event, MouseEvent.MOUSE_RELEASED)
+        self.event._updateQueue(event, MouseEvent.MOUSE_WHEEL)
 
     def keyPressed(self, event):
         if event.keyCode in self.modKey:

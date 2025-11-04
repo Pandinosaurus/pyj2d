@@ -43,6 +43,7 @@ class Event(object):
         self.eventName = {MouseEvent.MOUSE_PRESSED: 'MouseButtonDown',
                           MouseEvent.MOUSE_RELEASED: 'MouseButtonUp',
                           MouseEvent.MOUSE_MOVED: 'MouseMotion',
+                          MouseEvent.MOUSE_WHEEL: 'MouseWheel',
                           KeyEvent.KEY_PRESSED: 'KeyDown',
                           KeyEvent.KEY_RELEASED: 'KeyUp',
                           Const.ACTIVEEVENT: 'ActiveEvent',
@@ -52,6 +53,7 @@ class Event(object):
         self.eventType = [MouseEvent.MOUSE_PRESSED,
                           MouseEvent.MOUSE_RELEASED,
                           MouseEvent.MOUSE_MOVED,
+                          MouseEvent.MOUSE_WHEEL,
                           KeyEvent.KEY_PRESSED,
                           KeyEvent.KEY_RELEASED,
                           Const.ACTIVEEVENT,
@@ -404,6 +406,10 @@ class JEvent(object):
             'buttons': lambda self: self._getButtons(),
             'pos': lambda self: (self.event.getX(),self.event.getY()),
             'rel': lambda self: self._getRel(),
+            'x': lambda self: self._getWheelRotationX(),
+            'y': lambda self: self._getWheelRotationY(),
+            'precise_x': lambda self: self._getPreciseWheelRotationX(),
+            'precise_y': lambda self: self._getPreciseWheelRotationY(),
             'key': lambda self: self.event.getKeyCode(),
             'unicode': lambda self: self._getUnicode(),
             'mod': lambda self: self.event.getModifiers(),
@@ -413,10 +419,12 @@ class JEvent(object):
             }
     _mouseEvent = ('button', 'pos')
     _mouseMotionEvent = ('buttons', 'pos', 'rel')
+    _mouseWheelEvent = ('x', 'y', 'precise_x', 'precise_y')
     _keyEvent = ('key', 'unicode', 'mod', 'loc')
     _mousePos = {'x':0, 'y':0}
-    _mouseButton = {1:1, 2:2, 3:3, 4:6, 5:7, 6:8, 7:9}
     _mouseWheelButton = {-1:4, 1:5}
+    _mouseWheelRotation = {4:-1, 5:1}
+    _mousePreciseWheelRotation = {4:-1.0, 5:1.0}
     _activeEvent = ('state', 'gain')
     _activeState = {FocusEvent.FOCUS_GAINED: Const.APPINPUTFOCUS,
                     FocusEvent.FOCUS_LOST: Const.APPINPUTFOCUS,
@@ -440,12 +448,17 @@ class JEvent(object):
         
         Event object attributes:
         
-        * type: MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, KEYDOWN, KEYUP,
-                ACTIVEEVENT, WINDOWENTER, WINDOWLEAVE, QUIT
-        * button: mouse button pressed (1-9)
+        * type: MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION,
+                MOUSEWHEEL, KEYDOWN, KEYUP, ACTIVEEVENT,
+                WINDOWENTER, WINDOWLEAVE, QUIT
+        * button: mouse button pressed (1-5)
         * buttons: mouse buttons pressed (1,2,3)
         * pos: mouse position (x,y)
         * rel: mouse relative position change (x,y)
+        * x: mouse wheel rotation (-1,0,1)
+        * y: mouse wheel rotation (-1,0,1)
+        * precise_x: mouse precise wheel rotation (-1,0,1)
+        * precise_y: mouse precise wheel rotation (-1,0,1)
         * key: keycode of key pressed (K_a-K_z...)
         * unicode: char pressed ('a'-'z'...)
         * mod: modifier pressed (KMOD_ALT | KMOD_CTRL | KMOD_SHIFT | KMOD_META)
@@ -477,6 +490,7 @@ class JEvent(object):
         for attr in {Const.MOUSEBUTTONDOWN: self._mouseEvent,
                      Const.MOUSEBUTTONUP: self._mouseEvent,
                      Const.MOUSEMOTION: self._mouseMotionEvent,
+                     Const.MOUSEWHEEL: self._mouseWheelEvent,
                      Const.KEYDOWN: self._keyEvent,
                      Const.KEYUP: self._keyEvent,
                      Const.ACTIVEEVENT: self._activeEvent,
@@ -488,7 +502,7 @@ class JEvent(object):
 
     def _getButton(self):
         if self.event.getID() != MouseEvent.MOUSE_WHEEL:
-            return self._mouseButton[self.event.getButton()]
+            return self.event.getButton()
         else:
             return self._mouseWheelButton[self.event.getWheelRotation()]
 
@@ -506,6 +520,30 @@ class JEvent(object):
             self.__class__._mousePos['x'] = pos[0]
             self.__class__._mousePos['y'] = pos[1]
         return rel
+
+    def _getWheelRotationX(self):
+        if self.event.getID() == MouseEvent.MOUSE_WHEEL:
+            return 0
+        else:
+            return self._mouseWheelRotation[self.event.getButton()]
+
+    def _getWheelRotationY(self):
+        if self.event.getID() == MouseEvent.MOUSE_WHEEL:
+            return self.event.getWheelRotation() * -1
+        else:
+            return 0
+
+    def _getPreciseWheelRotationX(self):
+        if self.event.getID() == MouseEvent.MOUSE_WHEEL:
+            return 0.0
+        else:
+            return self._mousePreciseWheelRotation[self.event.getButton()]
+
+    def _getPreciseWheelRotationY(self):
+        if self.event.getID() == MouseEvent.MOUSE_WHEEL:
+            return self.event.getPreciseWheelRotation() * -1.0
+        else:
+            return 0.0
 
     def _getUnicode(self):
         try:
