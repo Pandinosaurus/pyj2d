@@ -35,10 +35,10 @@ class Frame(JFrame, WindowListener):
 
     def __init__(self, title, size):
         JFrame.__init__(self, title)
+        self.setPreferredSize(Dimension(size[0],size[1]))
         self.setDefaultCloseOperation(self.DO_NOTHING_ON_CLOSE)
-        self.setResizable(False)
-        self.setSize(size[0],size[1])
         self.setDefaultLookAndFeelDecorated(True)
+        self.setResizable(False)
         self.setBackground(Color.BLACK)
         self.addWindowListener(self)
         self.event = env.event
