@@ -314,6 +314,8 @@ class Display(Runnable):
         """
         Uninitialize display.
         """
+        if self.jframe:
+            self.jframe.stop()
         self._initialized = False
         return None
 
