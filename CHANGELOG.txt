@@ -1,4 +1,4 @@
-0.33_dev
+0.34    2026-05-09
 -refactor mouse positioning.
 -add mouse get_focused method.
 -refactor display surface.

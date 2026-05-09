@@ -23,7 +23,7 @@
 **PyJ2D - Jython Java2D Library**
 """
 
-__version__ = '0.33'
+__version__ = '0.34'
 
 from pyj2d import env
 from pyj2d import util
