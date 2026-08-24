@@ -4,6 +4,7 @@ PyJ2D module was modelled on Pygame commands that permits scripts coded in Pytho
 
 PyJ2D is released under the MIT License, see LICENSE.txt for further information.
 
+PyJ2D git: https://github.com/jggatc/pyj2d
 PyJ2D page: https://gatc.ca/projects/pyj2d/
 PyJ2D docs: https://gatc.ca/projects/pyj2d/doc/
 
